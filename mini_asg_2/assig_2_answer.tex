@@ -1,0 +1,63 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb}
+
+\title{ECE 712: Mini Assignment 2}
+\author{Your Name}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+Consider any tall matrix $A \in \mathbb{R}^{m \times n}$, which may be rank deficient, and a corresponding vector $b \in \mathbb{R}^m$.
+
+\begin{itemize}
+    \item Under what condition(s) does an exact solution $x$ exist for the system of equations $Ax = b$?
+    \item Develop a complete description for the solution $x$. 
+\end{itemize}
+
+\section*{Solution}
+
+We are asked to analyze the linear system
+\[
+A x = b, \quad A \in \mathbb{R}^{m \times n}, \; b \in \mathbb{R}^m,
+\]
+where $A$ is a tall matrix ($m \geq n$) which may be rank-deficient.
+
+\subsection*{Existence of a solution}
+The system $Ax = b$ has a solution if and only if $b$ lies in the column space of $A$, i.e.
+\[
+b \in R(A).
+\]
+If $b \notin R(A)$, then no exact solution exists.
+
+\subsection*{Structure of the solution}
+Assume $b \in R(A)$. Then there exists at least one solution $x_p$ such that
+\[
+A x_p = b.
+\]
+The set of all solutions can be described using the null space $N(A)$.  
+If $z \in N(A)$, then
+\[
+A(x_p + z) = A x_p + A z = b + 0 = b.
+\]
+Therefore, every solution can be written as
+\[
+x = x_p + z, \quad z \in N(A).
+\]
+
+\subsection*{Complete description}
+The system has a solution if and only if $b \in R(A)$.  
+If a solution exists, then the general solution is
+\[
+x = x_p + N(A),
+\]
+where $x_p$ is any particular solution and $N(A)$ is the null space of $A$.
+
+\subsection*{Remarks}
+\begin{itemize}
+    \item If $A$ has full column rank ($\text{rank}(A) = n$), then $N(A) = \{0\}$ and the solution is unique.
+    \item If $A$ is rank-deficient, then $N(A)$ has nonzero dimension and the solution set forms an affine subspace.
+\end{itemize}
+
+\end{document}
