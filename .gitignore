@@ -1,0 +1,23 @@
+# LaTeX build files
+*.aux
+*.bbl
+*.blg
+*.brf
+*.fls
+*.fdb_latexmk
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.xdv
+*.lof
+*.lot
+*.nav
+*.snm
+*.vrb
+
+# VSCode files
+.vscode/
+
+# Mac system files
+.DS_Store
