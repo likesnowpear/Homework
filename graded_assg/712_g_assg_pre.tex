@@ -1,8 +1,3 @@
-% =============================================
-% ECE 712 - Matrix Computations for Signal Processing
-% Assignment 1 Report Template (LaTeX)
-% Author: <Dai, Jiatao>
-% =============================================
 \documentclass[12pt,a4paper]{article}
 
 % ---------- Packages ----------
@@ -58,76 +53,96 @@
 \section{Question 1: PCA Compression and Reconstruction Error}
 
 \subsection{Method}
-Given $X\in\mathbb{R}^{1000\times 5}$, first mean-center columns $X_c=X-\bar X$. 
-Compute the sample covariance $C=\frac{1}{N-1}X_c^\top X_c$ (with $N=1000$). 
-Perform eigen-decomposition $C=V\Lambda V^\top$ (or SVD on $X_c$). 
-For a chosen rank $r$, let $V_r$ be the first $r$ eigenvectors (largest eigenvalues). 
-The $r$-D compression is $\Theta=X_c V_r$, and the centered reconstruction is $\hat X_r=\Theta V_r^\top=X_cV_rV_r^\top$. 
-We evaluate the Frobenius reconstruction error $E(r)=\lVert X_c-\hat X_r\rVert_F^2$ and the cumulative variance explained $\sum_{i=1}^r\lambda_i / \sum_{i=1}^5\lambda_i$.
+In this question, we are given a $1000 \times 5$ data matrix $X$ (from \texttt{X.mat}). 
+First, each column of $X$ is mean-centered to get $X_c = X - \bar{X}$. 
+Then we compute the covariance matrix:
+\[
+C = \frac{1}{N-1} X_c^\top X_c,
+\]
+where $N = 1000$. 
+
+Next, we perform eigen-decomposition of $C$:
+\[
+C = V \Lambda V^\top,
+\]
+where $\Lambda$ contains the eigenvalues and $V$ the eigenvectors. 
+For a given number of components $r$, we take the first $r$ columns of $V$ as $V_r$ and project the data:
+\[
+Y = X_c V_r.
+\]
+We can then reconstruct the data (in the centered form) by
+\[
+\hat{X}_r = Y V_r^\top = X_c V_r V_r^\top.
+\]
+The reconstruction error is measured using the Frobenius norm:
+\[
+E(r) = \|X_c - \hat{X}_r\|_F^2.
+\]
+We also compute the cumulative variance explained by the first $r$ components:
+\[
+\text{Cumulative Variance}(r) = \frac{\sum_{i=1}^r \lambda_i}{\sum_{i=1}^5 \lambda_i}.
+\]
 
 \subsection{Results}
-Numerical results from the provided dataset (\texttt{X.mat}) are:
+The PCA results from the dataset are summarized below.
+
 \begin{itemize}
-    \item Eigenvalues (descending): $\{5.0849,\ 0.0914,\ 0.0272,\ 0.0152,\ 0.0103\}$.
-    \item Cumulative variance explained $\{\;97.245\%,\ 98.993\%,\ 99.513\%,\ 99.803\%,\ 100.0\%\;\}$ for $r=1\ldots 5$.
-    \item Reconstruction errors (Frobenius): $\{143.9067,\ 52.5859,\ 25.4545,\ 10.2990,\ \approx 0\}$ for $r=1\ldots 5$.
+    \item Eigenvalues (sorted): $\{5.0849,\ 0.0914,\ 0.0272,\ 0.0152,\ 0.0103\}$.
+    \item Cumulative variance explained (\%): $\{97.25,\ 98.99,\ 99.51,\ 99.80,\ 100.0\}$.
+    \item Reconstruction error $E(r)$: $\{143.91,\ 52.59,\ 25.45,\ 10.30,\ \approx 0\}$.
 \end{itemize}
 
 \begin{table}[H]
 \centering
-\caption{PCA summary for $r=1\ldots 5$ (values from experiment).}
+\caption{Summary of PCA results for $r = 1$ to $5$.}
 \begin{tabular}{@{}cccc@{}}
 \toprule
-$r$ & Eigenvalue $\lambda_r$ & Cum.\ Var.\ Explained & $E(r)=\|X_c-\hat X_r\|_F^2$ \\
+$r$ & Eigenvalue $\lambda_r$ & Cumulative Var.\ (\%) & $E(r)$ \\
 \midrule
-1 & 5.0849 & 97.245\% & 143.9067 \\
-2 & 0.0914 & 98.993\% & 52.5859 \\
-3 & 0.0272 & 99.513\% & 25.4545 \\
-4 & 0.0152 & 99.803\% & 10.2990 \\
-5 & 0.0103 & 100.000\% & $\approx 1.49\times10^{-28}$ \\
+1 & 5.0849 & 97.25 & 143.91 \\
+2 & 0.0914 & 98.99 & 52.59 \\
+3 & 0.0272 & 99.51 & 25.45 \\
+4 & 0.0152 & 99.80 & 10.30 \\
+5 & 0.0103 & 100.0 & $\approx 0$ \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-\noindent The corresponding figures are reported in Fig.~\ref{fig:q1_err}, Fig.~\ref{fig:q1_cum}, and Fig.~\ref{fig:q1_scree}.
+The figures below show the reconstruction error, cumulative variance, and eigenvalue distribution.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{outputs/q1/q1_error_vs_r.png}
-    \caption{Reconstruction Error vs $r$.}
-    \label{fig:q1_err}
+    \caption{Reconstruction error vs. number of components $r$.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{outputs/q1/q1_cumvar_vs_r.png}
-    \caption{Cumulative Variance Explained vs $r$.}
-    \label{fig:q1_cum}
+    \caption{Cumulative variance explained by top $r$ components.}
 \end{figure}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.75\textwidth]{outputs/q1/q1_scree.png}
-    \caption{Eigenvalue Scree Plot.}
-    \label{fig:q1_scree}
+    \caption{Eigenvalue (scree) plot.}
 \end{figure}
 
 \subsection{Discussion}
-The spectrum shows a pronounced eigengap between the first and second components ($5.0849$ vs $0.0914$), indicating that the data are essentially near rank-$1$. 
-Accordingly, the cumulative variance explained already reaches $97.245\%$ at $r=1$. 
-As $r$ increases, the reconstruction error $E(r)$ decreases monotonically, consistent with the Eckart–Young–Mirsky theorem for optimal rank-$r$ approximations. 
-The negligible residual at $r=5$ ($\approx 1.49\times10^{-28}$) reflects numerical round-off, i.e., exact reconstruction within floating-point precision.
+From the results, we can see that most of the variance (around 97\%) is already captured by the first component. 
+The remaining components only add a small amount of variance. 
+As $r$ increases, the reconstruction error keeps getting smaller, which makes sense since we are keeping more information.
 
-\subsection{Conclusion}\label{sec:q1_conclusion}
-A practical model-order choice is $r^\ast=1$ (explaining $97.245\%$ of the variance) due to the strong eigengap and near rank-$1$ structure. 
-If a stricter threshold is required, $r=3$ surpasses $99.5\%$ cumulative variance. 
-We therefore adopt $r^\ast=1$ for compact representation and report full curves to justify the trade-off.
+\subsection{Conclusion}
+In this dataset, using just the first principal component already keeps most of the data variation. 
+If we use more components, the error decreases but the improvement becomes smaller. 
+A reasonable choice is $r=1$ or $r=2$, depending on how much accuracy we need.
 
 % ======================================================
 \newpage
 \section{Question 2: Proof of Minimum Reconstruction Error of PCA}
 
-\subsection{Problem Setup}
+\subsection{Objective}
 Let $X \in \mathbb{R}^{m\times d}$ be a mean-centered data matrix.
 For any $r$-dimensional orthonormal basis $U_r \in \mathbb{R}^{d\times r}$ with $U_r^\top U_r = I_r$, 
 the orthogonal projection of the data onto $\text{span}(U_r)$ and its reconstruction are
@@ -147,21 +162,25 @@ Because $P_{U_r}=U_rU_r^\top$ is an orthogonal projector, we have
 \quad\Rightarrow\quad
 E(U_r) = \|X\|_F^2 - \|XU_rU_r^\top\|_F^2.
 \]
-Thus, minimizing $E(U_r)$ is equivalent to maximizing $\|XU_r\|_F^2$.
+Thus, minimizing $E(U_r)$ is the same as maximizing $\|XU_r\|_F^2$.
 Since
 \[
 \|XU_r\|_F^2 = \text{tr}(U_r^\top X^\top XU_r),
 \]
-we want to find $U_r$ that maximizes this trace.
+we want to find $U_r$ that makes this trace as large as possible.
+
 Let $X^\top X = V\Lambda V^\top$ be the eigen-decomposition with eigenvalues
 $\lambda_1 \ge \lambda_2 \ge \cdots \ge \lambda_d$.
-By the Rayleigh–Ritz theorem,
+From the properties of symmetric matrices, the maximum trace is obtained when
+$U_r$ is made of the first $r$ eigenvectors of $X^\top X$:
 \[
-\max_{U_r^\top U_r = I_r} \text{tr}(U_r^\top X^\top XU_r)
-= \sum_{i=1}^{r}\lambda_i,
+U_r = [v_1,\ldots,v_r].
 \]
-and the maximum is achieved when $U_r = [v_1,\ldots,v_r]$ (the top $r$ eigenvectors of $X^\top X$).
-Therefore, projecting onto the PCA subspace minimizes the reconstruction error.
+In that case,
+\[
+\text{tr}(U_r^\top X^\top XU_r) = \sum_{i=1}^{r}\lambda_i.
+\]
+Therefore, projecting onto these eigenvectors (the PCA subspace) gives the smallest possible reconstruction error.
 
 \subsection{Conclusion}
 PCA provides the orthogonal basis that minimizes the reconstruction error,
@@ -170,19 +189,14 @@ and the minimum possible error is
 E_{\min}(r) = \sum_{i=r+1}^{d} \sigma_i^2,
 \]
 where $\sigma_i$ are the singular values of $X$.
-This theoretical result agrees with the trend observed in Question~1,
-where the reconstruction error decreases as $r$ increases.
+This result matches what we observed in Question~1, where the reconstruction error decreases as $r$ increases.
 
-% ======================================================
-\newpage
-% ======================================================
-\newpage
 % ======================================================
 \newpage
 \section{Question 3: Minimum-Variance FIR Filter Design}
 
 \subsection{Objective}
-In this question, we are given a mean-centered coloured random sequence $x[n]$ (from \texttt{x.mat} or \texttt{xb.mat}).  
+In this question, we are given a mean-centered coloured random sequence $x[n]$ (from \texttt{xb.mat}).  
 The goal is to design a finite impulse response (FIR) filter $h[n]$ with length $N$ and unit norm $\|h\|_2 = 1$ so that the output $y[n]=(h*x)[n]$ has the smallest possible variance.
 
 \subsection{Method}
@@ -272,13 +286,12 @@ When $N$ is larger, the filter becomes smoother and can reduce more of the corre
 From the table and plots, we can see that as $N$ increases, the filter can make the output smoother and the variance smaller.  
 This matches the idea that a longer filter has more freedom to cancel out the correlation in $x[n]$.  
 All the results follow the theory that the minimum-variance filter corresponds to the smallest eigenvector of $R_x$.  
-In summary, the experiment confirms that PCA-like eigen-decomposition can also be used to design such filters, and the implementation works as expected.
+In summary, the experiment confirms that the eigen-decomposition of the covariance matrix can be used to design such filters, and the implementation works as expected.
 % ======================================================
 \newpage
 \section*{References}
 \begin{itemize}
-    \item James Reilly, \textit{Fundamentals of Linear Algebra for Signal Processing}
-    \item Lecture Notes, ECE 712, McMaster University.
+    \item J. Reilly, \textit{Fundamentals of Linear Algebra for Signal Processing}, Lecture Notes, ECE 712, McMaster University.
 \end{itemize}
 
 \end{document}
