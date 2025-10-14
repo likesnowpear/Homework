@@ -1,7 +1,7 @@
 % =============================================
 % ECE 712 - Matrix Computations for Signal Processing
 % Assignment 1 Report Template (LaTeX)
-% Author: <Your Name>
+% Author: <Dai, Jiatao>
 % =============================================
 \documentclass[12pt,a4paper]{article}
 
@@ -27,8 +27,8 @@
 \newcommand{\coursename}{ECE 712: Matrix Computations for Signal Processing}
 \newcommand{\assignmenttitle}{Assignment 1}
 \newcommand{\studentname}{Dai, Jiatao}
-\newcommand{\studentid}{Student ID: 400548587}
-\newcommand{\duedate}{Due: October 12, 2025}
+\newcommand{\studentid}{400548587}
+\newcommand{\duedate}{October 12, 2025}
 
 % ---------- Begin Document ----------
 \begin{document}
@@ -47,7 +47,7 @@
     \vfill
     {\Large McMaster University \\[0.3cm]
     Department of Electrical and Computer Engineering \\[0.3cm]
-    \today}
+    October 12, 2025}
 \end{titlepage}
 
 % ---------- Table of Contents ----------
@@ -57,73 +57,227 @@
 % ======================================================
 \section{Question 1: PCA Compression and Reconstruction Error}
 
-\subsection{Objective}
-Perform PCA compression on the $1000\times5$ data matrix $X$ provided in \texttt{X.mat}.  
-Explain the method, comment on the effect of varying $r$, and evaluate the reconstruction error.
+\subsection{Method}
+Given $X\in\mathbb{R}^{1000\times 5}$, first mean-center columns $X_c=X-\bar X$. 
+Compute the sample covariance $C=\frac{1}{N-1}X_c^\top X_c$ (with $N=1000$). 
+Perform eigen-decomposition $C=V\Lambda V^\top$ (or SVD on $X_c$). 
+For a chosen rank $r$, let $V_r$ be the first $r$ eigenvectors (largest eigenvalues). 
+The $r$-D compression is $\Theta=X_c V_r$, and the centered reconstruction is $\hat X_r=\Theta V_r^\top=X_cV_rV_r^\top$. 
+We evaluate the Frobenius reconstruction error $E(r)=\lVert X_c-\hat X_r\rVert_F^2$ and the cumulative variance explained $\sum_{i=1}^r\lambda_i / \sum_{i=1}^5\lambda_i$.
 
-\subsection{Methodology}
+\subsection{Results}
+Numerical results from the provided dataset (\texttt{X.mat}) are:
 \begin{itemize}
-    \item Mean-center the data: \( X_c = X - \bar{X} \)
-    \item Compute covariance matrix: \( C = \frac{1}{N-1} X_c^T X_c \)
-    \item Perform eigen-decomposition or SVD.
-    \item Select top $r$ components and reconstruct \( \hat{X}_r = X_c V_r V_r^T \).
-    \item Compute reconstruction error \( E = \|X_c - \hat{X}_r\|_F^2 \).
+    \item Eigenvalues (descending): $\{5.0849,\ 0.0914,\ 0.0272,\ 0.0152,\ 0.0103\}$.
+    \item Cumulative variance explained $\{\;97.245\%,\ 98.993\%,\ 99.513\%,\ 99.803\%,\ 100.0\%\;\}$ for $r=1\ldots 5$.
+    \item Reconstruction errors (Frobenius): $\{143.9067,\ 52.5859,\ 25.4545,\ 10.2990,\ \approx 0\}$ for $r=1\ldots 5$.
 \end{itemize}
 
+\begin{table}[H]
+\centering
+\caption{PCA summary for $r=1\ldots 5$ (values from experiment).}
+\begin{tabular}{@{}cccc@{}}
+\toprule
+$r$ & Eigenvalue $\lambda_r$ & Cum.\ Var.\ Explained & $E(r)=\|X_c-\hat X_r\|_F^2$ \\
+\midrule
+1 & 5.0849 & 97.245\% & 143.9067 \\
+2 & 0.0914 & 98.993\% & 52.5859 \\
+3 & 0.0272 & 99.513\% & 25.4545 \\
+4 & 0.0152 & 99.803\% & 10.2990 \\
+5 & 0.0103 & 100.000\% & $\approx 1.49\times10^{-28}$ \\
+\bottomrule
+\end{tabular}
+\end{table}
 
-Discuss how the reconstruction error decreases as $r$ increases, and what it implies about data dimensionality.
+\noindent The corresponding figures are reported in Fig.~\ref{fig:q1_err}, Fig.~\ref{fig:q1_cum}, and Fig.~\ref{fig:q1_scree}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{outputs/q1/q1_error_vs_r.png}
+    \caption{Reconstruction Error vs $r$.}
+    \label{fig:q1_err}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{outputs/q1/q1_cumvar_vs_r.png}
+    \caption{Cumulative Variance Explained vs $r$.}
+    \label{fig:q1_cum}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{outputs/q1/q1_scree.png}
+    \caption{Eigenvalue Scree Plot.}
+    \label{fig:q1_scree}
+\end{figure}
+
+\subsection{Discussion}
+The spectrum shows a pronounced eigengap between the first and second components ($5.0849$ vs $0.0914$), indicating that the data are essentially near rank-$1$. 
+Accordingly, the cumulative variance explained already reaches $97.245\%$ at $r=1$. 
+As $r$ increases, the reconstruction error $E(r)$ decreases monotonically, consistent with the Eckart–Young–Mirsky theorem for optimal rank-$r$ approximations. 
+The negligible residual at $r=5$ ($\approx 1.49\times10^{-28}$) reflects numerical round-off, i.e., exact reconstruction within floating-point precision.
+
+\subsection{Conclusion}\label{sec:q1_conclusion}
+A practical model-order choice is $r^\ast=1$ (explaining $97.245\%$ of the variance) due to the strong eigengap and near rank-$1$ structure. 
+If a stricter threshold is required, $r=3$ surpasses $99.5\%$ cumulative variance. 
+We therefore adopt $r^\ast=1$ for compact representation and report full curves to justify the trade-off.
 
 % ======================================================
 \newpage
-\section{Question 2: Proof of Minimum Reconstruction Error}
+\section{Question 2: Proof of Minimum Reconstruction Error of PCA}
 
-\subsection{Objective}
-Prove that PCA yields the minimum reconstruction error among all possible orthonormal bases.
-
-\subsection{Theoretical Proof}
-Use the Eckart–Young–Mirsky theorem:
+\subsection{Problem Setup}
+Let $X \in \mathbb{R}^{m\times d}$ be a mean-centered data matrix.
+For any $r$-dimensional orthonormal basis $U_r \in \mathbb{R}^{d\times r}$ with $U_r^\top U_r = I_r$, 
+the orthogonal projection of the data onto $\text{span}(U_r)$ and its reconstruction are
 \[
-\min_{\text{rank}(B)=r} \|X - B\|_F = \sqrt{\sum_{i=r+1}^{n} \sigma_i^2}
+\hat X_r = XU_rU_r^\top.
 \]
-where $\sigma_i$ are singular values of $X$.  
-Therefore, truncating the SVD at $r$ components yields the optimal low-rank approximation.
+The reconstruction error is defined as
+\[
+E(U_r) = \|X - \hat X_r\|_F^2 = \|X - XU_rU_r^\top\|_F^2.
+\]
+Our goal is to show that the PCA basis $U_r$ gives the smallest possible reconstruction error among all orthonormal bases.
 
-\subsection{Numerical Verification (Optional)}
-Insert your result comparison:
-\begin{verbatim}
-Truncated SVD error: 0.0023
-Random basis projection error: 0.0974
-\end{verbatim}
+\subsection{Proof (Projection $\Rightarrow$ Trace Maximization $\Rightarrow$ PCA)}
+Because $P_{U_r}=U_rU_r^\top$ is an orthogonal projector, we have
+\[
+\|X\|_F^2 = \|XP_{U_r}\|_F^2 + \|X(I-P_{U_r})\|_F^2
+\quad\Rightarrow\quad
+E(U_r) = \|X\|_F^2 - \|XU_rU_r^\top\|_F^2.
+\]
+Thus, minimizing $E(U_r)$ is equivalent to maximizing $\|XU_r\|_F^2$.
+Since
+\[
+\|XU_r\|_F^2 = \text{tr}(U_r^\top X^\top XU_r),
+\]
+we want to find $U_r$ that maximizes this trace.
+Let $X^\top X = V\Lambda V^\top$ be the eigen-decomposition with eigenvalues
+$\lambda_1 \ge \lambda_2 \ge \cdots \ge \lambda_d$.
+By the Rayleigh–Ritz theorem,
+\[
+\max_{U_r^\top U_r = I_r} \text{tr}(U_r^\top X^\top XU_r)
+= \sum_{i=1}^{r}\lambda_i,
+\]
+and the maximum is achieved when $U_r = [v_1,\ldots,v_r]$ (the top $r$ eigenvectors of $X^\top X$).
+Therefore, projecting onto the PCA subspace minimizes the reconstruction error.
 
-Discuss how this confirms the theoretical result.
+\subsection{Conclusion}
+PCA provides the orthogonal basis that minimizes the reconstruction error,
+and the minimum possible error is
+\[
+E_{\min}(r) = \sum_{i=r+1}^{d} \sigma_i^2,
+\]
+where $\sigma_i$ are the singular values of $X$.
+This theoretical result agrees with the trend observed in Question~1,
+where the reconstruction error decreases as $r$ increases.
 
+% ======================================================
+\newpage
+% ======================================================
+\newpage
 % ======================================================
 \newpage
 \section{Question 3: Minimum-Variance FIR Filter Design}
 
 \subsection{Objective}
-Given a mean-centered random sequence $x[n]$ from \texttt{x.mat},  
-find an FIR filter $h[n]$ (with constrained 2-norm) such that the output $y[n] = (h*x)[n]$ has minimum variance.
+In this question, we are given a mean-centered coloured random sequence $x[n]$ (from \texttt{x.mat} or \texttt{xb.mat}).  
+The goal is to design a finite impulse response (FIR) filter $h[n]$ with length $N$ and unit norm $\|h\|_2 = 1$ so that the output $y[n]=(h*x)[n]$ has the smallest possible variance.
 
-\subsection{Methodology}
+\subsection{Method}
+First, we calculate the sample autocorrelation $r_x[\ell]$ of $x[n]$.  
+Then we form a Toeplitz covariance matrix
+\[
+R_x = \mathrm{Toeplitz}(r_x[0], r_x[1], \ldots, r_x[N-1]).
+\]
+The output variance can be written as
+\[
+\sigma_y^2 = h^\top R_x h, \quad \text{subject to } \|h\|_2 = 1.
+\]
+The minimum variance happens when $h$ is the eigenvector of $R_x$ that corresponds to its smallest eigenvalue.  
+In other words, we just find the smallest eigenvalue and take the corresponding eigenvector as the filter.
+
+\subsection{Implementation}
+The Python script \texttt{q3\_minvar\_fir\_final.py} loads the signal, computes $r_x[\ell]$, builds $R_x$, and finds the minimum-variance filter for $N=8,12,16,24$.  
+It also saves the plots:
 \begin{itemize}
-    \item Compute the sample autocorrelation \( r_x[l] \) of \( x[n] \).
-    \item Construct the Toeplitz covariance matrix \( R_x \).
-    \item Formulate the optimization problem:
-    \[
-    \min_{h} \; h^T R_x h \quad \text{s.t. } \|h\|_2 = 1
-    \]
-    \item The solution is the eigenvector of $R_x$ corresponding to its smallest eigenvalue.
+    \item \texttt{q3\_autocorr.png}: autocorrelation of $x[n]$
+    \item \texttt{q3\_var\_vs\_N.png}: output variance vs.\ $N$
+    \item \texttt{q3\_impulse\_N\{N\}.png}: impulse response of $h[n]$
+    \item \texttt{q3\_spectrum\_N\{N\}.png}: magnitude spectrum $|H(e^{j\omega})|$
 \end{itemize}
 
+\subsection{Results}
+The input signal clearly has correlation (it is not white noise), which can be seen in Fig.~\ref{fig:q3_autocorr}.  
+As the filter length $N$ increases, the output variance becomes smaller (see Fig.~\ref{fig:q3_var_vs_N}).  
+The quantitative results are listed in Table~\ref{tab:q3_results}.
 
-Discuss the observed minimum variance and characteristics of the resulting filter.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{outputs/q3/q3_autocorr.png}
+    \caption{Autocorrelation of $x[n]$.}
+    \label{fig:q3_autocorr}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{outputs/q3/q3_var_vs_N.png}
+    \caption{Output variance $\sigma_y^2$ vs.\ filter length $N$.}
+    \label{fig:q3_var_vs_N}
+\end{figure}
+
+\begin{table}[H]
+\centering
+\caption{Result summary for different FIR lengths.}
+\label{tab:q3_results}
+\begin{tabular}{@{}ccc@{}}
+\toprule
+$N$ & $\sigma_y^2$ (variance) & $\lambda_{\min}(R_x)$ \\
+\midrule
+8  & 0.0817 & 409.53 \\
+12 & 0.0637 & 318.93 \\
+16 & 0.0494 & 247.38 \\
+24 & 0.0340 & 170.04 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Some example impulse and magnitude responses are shown in Fig.~\ref{fig:q3_impulse_spectrum}.  
+When $N$ is larger, the filter becomes smoother and can reduce more of the correlated part of the signal.
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{outputs/q3/N8/q3_impulse_N8.png}
+        \caption{$h[n]$ for $N=8$}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{outputs/q3/N8/q3_spectrum_N8.png}
+        \caption{$|H(e^{j\omega})|$ for $N=8$}
+    \end{subfigure}\\[0.6em]
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{outputs/q3/N24/q3_impulse_N24.png}
+        \caption{$h[n]$ for $N=24$}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}
+        \includegraphics[width=\linewidth]{outputs/q3/N24/q3_spectrum_N24.png}
+        \caption{$|H(e^{j\omega})|$ for $N=24$}
+    \end{subfigure}
+    \caption{Impulse and magnitude responses for two filter lengths.}
+    \label{fig:q3_impulse_spectrum}
+\end{figure}
+
+\subsection{Discussion and Conclusion}
+From the table and plots, we can see that as $N$ increases, the filter can make the output smoother and the variance smaller.  
+This matches the idea that a longer filter has more freedom to cancel out the correlation in $x[n]$.  
+All the results follow the theory that the minimum-variance filter corresponds to the smallest eigenvector of $R_x$.  
+In summary, the experiment confirms that PCA-like eigen-decomposition can also be used to design such filters, and the implementation works as expected.
 % ======================================================
 \newpage
 \section*{References}
 \begin{itemize}
-    \item S. Haykin and B. Van Veen, \textit{Fundamentals of Linear Algebra for Signal Processing}, 3rd Ed., Springer, 2023.
+    \item James Reilly, \textit{Fundamentals of Linear Algebra for Signal Processing}
     \item Lecture Notes, ECE 712, McMaster University.
 \end{itemize}
 
