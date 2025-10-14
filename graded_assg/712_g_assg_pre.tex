@@ -1,0 +1,130 @@
+% =============================================
+% ECE 712 - Matrix Computations for Signal Processing
+% Assignment 1 Report Template (LaTeX)
+% Author: <Your Name>
+% =============================================
+\documentclass[12pt,a4paper]{article}
+
+% ---------- Packages ----------
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{titlesec}
+\usepackage{hyperref}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+% ---------- Page Setup ----------
+\geometry{margin=1in}
+\setstretch{1.25}
+\titleformat{\section}{\Large\bfseries}{\thesection.}{0.5em}{}
+\titleformat{\subsection}{\large\bfseries}{\thesubsection}{0.5em}{}
+
+% ---------- Metadata ----------
+\newcommand{\coursename}{ECE 712: Matrix Computations for Signal Processing}
+\newcommand{\assignmenttitle}{Assignment 1}
+\newcommand{\studentname}{Dai, Jiatao}
+\newcommand{\studentid}{Student ID: 400548587}
+\newcommand{\duedate}{Due: October 12, 2025}
+
+% ---------- Begin Document ----------
+\begin{document}
+
+% ---------- Title Page ----------
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\Huge \textbf{\assignmenttitle}}\\[1.5cm]
+    {\Large \coursename}\\[1cm]
+    \vspace{1cm}
+    \textbf{Name:} \studentname \\[0.3cm]
+    \textbf{Student ID:} \studentid \\[0.3cm]
+    \textbf{Date:} \duedate \\[2cm]
+
+    \vfill
+    {\Large McMaster University \\[0.3cm]
+    Department of Electrical and Computer Engineering \\[0.3cm]
+    \today}
+\end{titlepage}
+
+% ---------- Table of Contents ----------
+\tableofcontents
+\newpage
+
+% ======================================================
+\section{Question 1: PCA Compression and Reconstruction Error}
+
+\subsection{Objective}
+Perform PCA compression on the $1000\times5$ data matrix $X$ provided in \texttt{X.mat}.  
+Explain the method, comment on the effect of varying $r$, and evaluate the reconstruction error.
+
+\subsection{Methodology}
+\begin{itemize}
+    \item Mean-center the data: \( X_c = X - \bar{X} \)
+    \item Compute covariance matrix: \( C = \frac{1}{N-1} X_c^T X_c \)
+    \item Perform eigen-decomposition or SVD.
+    \item Select top $r$ components and reconstruct \( \hat{X}_r = X_c V_r V_r^T \).
+    \item Compute reconstruction error \( E = \|X_c - \hat{X}_r\|_F^2 \).
+\end{itemize}
+
+
+Discuss how the reconstruction error decreases as $r$ increases, and what it implies about data dimensionality.
+
+% ======================================================
+\newpage
+\section{Question 2: Proof of Minimum Reconstruction Error}
+
+\subsection{Objective}
+Prove that PCA yields the minimum reconstruction error among all possible orthonormal bases.
+
+\subsection{Theoretical Proof}
+Use the Eckart–Young–Mirsky theorem:
+\[
+\min_{\text{rank}(B)=r} \|X - B\|_F = \sqrt{\sum_{i=r+1}^{n} \sigma_i^2}
+\]
+where $\sigma_i$ are singular values of $X$.  
+Therefore, truncating the SVD at $r$ components yields the optimal low-rank approximation.
+
+\subsection{Numerical Verification (Optional)}
+Insert your result comparison:
+\begin{verbatim}
+Truncated SVD error: 0.0023
+Random basis projection error: 0.0974
+\end{verbatim}
+
+Discuss how this confirms the theoretical result.
+
+% ======================================================
+\newpage
+\section{Question 3: Minimum-Variance FIR Filter Design}
+
+\subsection{Objective}
+Given a mean-centered random sequence $x[n]$ from \texttt{x.mat},  
+find an FIR filter $h[n]$ (with constrained 2-norm) such that the output $y[n] = (h*x)[n]$ has minimum variance.
+
+\subsection{Methodology}
+\begin{itemize}
+    \item Compute the sample autocorrelation \( r_x[l] \) of \( x[n] \).
+    \item Construct the Toeplitz covariance matrix \( R_x \).
+    \item Formulate the optimization problem:
+    \[
+    \min_{h} \; h^T R_x h \quad \text{s.t. } \|h\|_2 = 1
+    \]
+    \item The solution is the eigenvector of $R_x$ corresponding to its smallest eigenvalue.
+\end{itemize}
+
+
+Discuss the observed minimum variance and characteristics of the resulting filter.
+
+% ======================================================
+\newpage
+\section*{References}
+\begin{itemize}
+    \item S. Haykin and B. Van Veen, \textit{Fundamentals of Linear Algebra for Signal Processing}, 3rd Ed., Springer, 2023.
+    \item Lecture Notes, ECE 712, McMaster University.
+\end{itemize}
+
+\end{document}
