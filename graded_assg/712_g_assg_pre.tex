@@ -193,100 +193,52 @@ This result matches what we observed in Question~1, where the reconstruction err
 
 % ======================================================
 \newpage
-\section{Question 3: Minimum-Variance FIR Filter Design}
+\section{Question 3: Quadratic Form Minimization}
 
 \subsection{Objective}
-In this question, we are given a mean-centered coloured random sequence $x[n]$ (from \texttt{xb.mat}).  
-The goal is to design a finite impulse response (FIR) filter $h[n]$ with length $N$ and unit norm $\|h\|_2 = 1$ so that the output $y[n]=(h*x)[n]$ has the smallest possible variance.
+In this question, we are given a real-valued data vector $x$ (from \texttt{xb.mat}).  
+For a chosen length $N$, we want to find a vector $h \in \mathbb{R}^N$ with unit norm $\|h\|_2 = 1$ that minimizes a quadratic form $h^\top A h$,  
+where $A$ is a symmetric matrix constructed from the data.
 
 \subsection{Method}
-First, we calculate the sample autocorrelation $r_x[\ell]$ of $x[n]$.  
-Then we form a Toeplitz covariance matrix
+We first build a symmetric matrix $A$ using inner products between shifted copies of $x$, so that each entry represents how similar two parts of the vector are.  
+This makes $A$ symmetric by construction.  
+The minimization problem can be written as:
 \[
-R_x = \mathrm{Toeplitz}(r_x[0], r_x[1], \ldots, r_x[N-1]).
+\min_{\|h\|_2 = 1} \; h^\top A h.
 \]
-The output variance can be written as
-\[
-\sigma_y^2 = h^\top R_x h, \quad \text{subject to } \|h\|_2 = 1.
-\]
-The minimum variance happens when $h$ is the eigenvector of $R_x$ that corresponds to its smallest eigenvalue.  
-In other words, we just find the smallest eigenvalue and take the corresponding eigenvector as the filter.
+From linear algebra theory, for a symmetric matrix $A$, this value is smallest when $h$ is the eigenvector that corresponds to the smallest eigenvalue of $A$.  
+So we just compute the eigenvalues and take the eigenvector associated with the smallest one.
 
-\subsection{Implementation}
-The Python script \texttt{q3\_minvar\_fir\_final.py} loads the signal, computes $r_x[\ell]$, builds $R_x$, and finds the minimum-variance filter for $N=8,12,16,24$.  
-It also saves the plots:
-\begin{itemize}
-    \item \texttt{q3\_autocorr.png}: autocorrelation of $x[n]$
-    \item \texttt{q3\_var\_vs\_N.png}: output variance vs.\ $N$
-    \item \texttt{q3\_impulse\_N\{N\}.png}: impulse response of $h[n]$
-    \item \texttt{q3\_spectrum\_N\{N\}.png}: magnitude spectrum $|H(e^{j\omega})|$
-\end{itemize}
 
-\subsection{Results}
-The input signal clearly has correlation (it is not white noise), which can be seen in Fig.~\ref{fig:q3_autocorr}.  
-As the filter length $N$ increases, the output variance becomes smaller (see Fig.~\ref{fig:q3_var_vs_N}).  
-The quantitative results are listed in Table~\ref{tab:q3_results}.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{outputs/q3/q3_autocorr.png}
-    \caption{Autocorrelation of $x[n]$.}
-    \label{fig:q3_autocorr}
-\end{figure}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.7\textwidth]{outputs/q3/q3_var_vs_N.png}
-    \caption{Output variance $\sigma_y^2$ vs.\ filter length $N$.}
-    \label{fig:q3_var_vs_N}
-\end{figure}
+I use a Python script to load the vector, centers it by removing its mean, and constructs $A$ for several lengths $N = 8, 12, 16, 24$.  
+Then it computes the smallest eigenvalue and its eigenvector.  
+The results (smallest eigenvalues) are summarized in a simple table.
 
 \begin{table}[H]
 \centering
-\caption{Result summary for different FIR lengths.}
+\caption{Results for different $N$ values.}
 \label{tab:q3_results}
-\begin{tabular}{@{}ccc@{}}
+\begin{tabular}{@{}cc@{}}
 \toprule
-$N$ & $\sigma_y^2$ (variance) & $\lambda_{\min}(R_x)$ \\
+$N$ & Smallest eigenvalue of $A$ \\
 \midrule
-8  & 0.0817 & 409.53 \\
-12 & 0.0637 & 318.93 \\
-16 & 0.0494 & 247.38 \\
-24 & 0.0340 & 170.04 \\
+8  & 409.53 \\
+12 & 318.93 \\
+16 & 247.38 \\
+24 & 170.04 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Some example impulse and magnitude responses are shown in Fig.~\ref{fig:q3_impulse_spectrum}.  
-When $N$ is larger, the filter becomes smoother and can reduce more of the correlated part of the signal.
+\subsection{Conclusion}
+By constructing a symmetric matrix $A$ and solving $\min_{\|h\|_2=1} h^\top A h$,  
+we found that the smallest eigenvalue and its eigenvector provide the solution.  
 
-\begin{figure}[H]
-    \centering
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\linewidth]{outputs/q3/N8/q3_impulse_N8.png}
-        \caption{$h[n]$ for $N=8$}
-    \end{subfigure}\hfill
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\linewidth]{outputs/q3/N8/q3_spectrum_N8.png}
-        \caption{$|H(e^{j\omega})|$ for $N=8$}
-    \end{subfigure}\\[0.6em]
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\linewidth]{outputs/q3/N24/q3_impulse_N24.png}
-        \caption{$h[n]$ for $N=24$}
-    \end{subfigure}\hfill
-    \begin{subfigure}{0.48\textwidth}
-        \includegraphics[width=\linewidth]{outputs/q3/N24/q3_spectrum_N24.png}
-        \caption{$|H(e^{j\omega})|$ for $N=24$}
-    \end{subfigure}
-    \caption{Impulse and magnitude responses for two filter lengths.}
-    \label{fig:q3_impulse_spectrum}
-\end{figure}
 
-\subsection{Discussion and Conclusion}
-From the table and plots, we can see that as $N$ increases, the filter can make the output smoother and the variance smaller.  
-This matches the idea that a longer filter has more freedom to cancel out the correlation in $x[n]$.  
-All the results follow the theory that the minimum-variance filter corresponds to the smallest eigenvector of $R_x$.  
-In summary, the experiment confirms that the eigen-decomposition of the covariance matrix can be used to design such filters, and the implementation works as expected.
+As $N$ increases, the smallest eigenvalue of $A$ becomes smaller.  
+This makes sense because with a larger $N$, the matrix captures more of the relationships inside $x$, and the minimization has more directions to choose from.  
+The eigenvector corresponding to this smallest eigenvalue represents the direction where the quadratic form $h^\top A h$ reaches its minimum.
 % ======================================================
 \newpage
 \section*{References}

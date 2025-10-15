@@ -1,15 +1,3 @@
-#!/usr/bin/env python3
-"""
-ECE 712 - Assignment 1 (Q1 only) : PCA Compression on X (1000x5)
-Usage:
-  1) Place `X.mat` in the same directory as this script.
-  2) Run: python3 q1_pca.py
-Outputs:
-  outputs/q1/q1_error_vs_r.png
-  outputs/q1/q1_cumvar_vs_r.png
-  outputs/q1/q1_scree.png
-  outputs/q1/q1_metrics.json
-"""
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.io import loadmat
@@ -45,12 +33,12 @@ def main():
         print(f"[INFO] Using variable '{keys[0]}' from X.mat")
 
     # ---- PCA pipeline ----
-    Xc = center_columns(X)               # mean-centered data
-    C = np.cov(Xc, rowvar=False)         # sample covariance (variables in columns)
+    Xc = center_columns(X)               
+    C = np.cov(Xc, rowvar=False)
 
     # eigen-decomposition (symmetric)
-    vals, vecs = eigh(C)                 # ascending
-    idx = np.argsort(vals)[::-1]         # descending
+    vals, vecs = eigh(C)                 
+    idx = np.argsort(vals)[::-1]         
     lam = vals[idx]
     V   = vecs[:, idx]
 
@@ -58,7 +46,7 @@ def main():
     varexp = []
     for r in range(1, V.shape[1]+1):
         Vr = V[:, :r]
-        Xhat = Xc @ Vr @ Vr.T            # reconstruction from r PCs
+        Xhat = Xc @ Vr @ Vr.T            
         errors.append(fro_error(Xc, Xhat))
         varexp.append(np.sum(lam[:r]) / np.sum(lam))
 
