@@ -1,0 +1,116 @@
+\documentclass[12pt]{article}
+\usepackage{amsmath, amssymb, bm}
+
+\title{ECE 712: Mini Assignment 3}
+\author{Dai, Jiatao}
+\date{Oct 25, 2025}
+
+\begin{document}
+\maketitle
+
+\section*{Problem}
+Let the singular value decomposition (SVD) of a matrix $A \in \mathbb{R}^{m \times n}$ be
+\[
+A = U \Sigma V^{T},
+\]
+where
+\[
+U = \begin{bmatrix} U_1 & U_2 \end{bmatrix}, \quad
+V = \begin{bmatrix} V_1 & V_2 \end{bmatrix}, \quad
+\Sigma =
+\begin{bmatrix}
+\Sigma_r & 0 \\
+0 & \Sigma_2
+\end{bmatrix},
+\]
+and $\Sigma_r = \mathrm{diag}(\sigma_1,\dots,\sigma_r)$ contains the $r$ largest singular values. The truncated rank-$r$ approximation of $A$ is defined as
+\[
+A_r = U_1 \Sigma_r V_1^{T}.
+\]
+
+\begin{itemize}
+    \item Show that $A_r = P_c A$, where $P_c = U_1 U_1^T$ is a projection matrix, and identify the corresponding subspace.
+    \item Show that $A_r^T = P_r A^T$, where $P_r = V_1 V_1^T$ is a projection matrix, and identify the corresponding subspace.
+\end{itemize}
+
+\section*{Solution}
+
+\subsection*{SVD and truncated approximation}
+From the SVD, we expand $A$ as
+\[
+A = U \Sigma V^T =
+\begin{bmatrix} U_1 & U_2 \end{bmatrix}
+\begin{bmatrix}
+\Sigma_r & 0 \\
+0 & \Sigma_2
+\end{bmatrix}
+\begin{bmatrix} V_1^T \\ V_2^T \end{bmatrix}.
+\]
+
+The truncated rank-$r$ approximation is
+\[
+A_r = U_1 \Sigma_r V_1^T.
+\]
+
+\subsection*{1) Proof that $A_r = P_c A$}
+Define the projection matrix
+\[
+P_c = U_1 U_1^T.
+\]
+Then
+\[
+\begin{aligned}
+P_c A
+&= U_1 U_1^T \, U \Sigma V^T \\
+&= U_1
+\begin{bmatrix} I & 0 \end{bmatrix}
+\begin{bmatrix}
+\Sigma_r & 0 \\
+0 & \Sigma_2
+\end{bmatrix}
+\begin{bmatrix} V_1^T \\ V_2^T \end{bmatrix} \\
+&= U_1 \Sigma_r V_1^T \\
+&= A_r.
+\end{aligned}
+\]
+
+\noindent
+Thus, $A_r$ is obtained by projecting $A$ onto the subspace
+\[
+\mathcal{S}_c = \mathrm{span}(U_1),
+\]
+which is called \textbf{the $r$-dimensional subspace defined by $U_1$, i.e. a subspace of R(A)}.
+If $r = \mathrm{rank}(A)$, then $\mathcal{S}_c = \mathcal{R}(A)$, the column space of $A$.
+
+\subsection*{2) Proof that $A_r^T = P_r A^T$}
+Define the projection matrix
+\[
+P_r = V_1 V_1^T.
+\]
+Using transpose,
+\[
+A_r^T = (U_1 \Sigma_r V_1^T)^T = V_1 \Sigma_r U_1^T.
+\]
+Now compute:
+\[
+\begin{aligned}
+P_r A^T
+&= V_1 V_1^T (V \Sigma^T U^T) \\
+&= V_1
+\begin{bmatrix} I & 0 \end{bmatrix}
+\Sigma_r
+\begin{bmatrix} U_1^T \\ U_2^T \end{bmatrix} \\
+&= V_1 \Sigma_r U_1^T \\
+&= A_r^T.
+\end{aligned}
+\]
+
+\noindent
+Thus, $A_r^T$ is obtained by projecting $A^T$ onto the subspace
+\[
+\mathcal{S}_r = \mathrm{span}(V_1),
+\]
+which is called \textbf{the $r$-dimensional subspace defined by $U_1$, i.e. a subspace of R(A)}.
+If $r = \mathrm{rank}(A)$, then $\mathcal{S}_r = \mathcal{R}(A^T) = \mathcal{N}(A)^\perp$.
+
+\end{document}
